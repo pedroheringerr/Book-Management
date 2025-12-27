@@ -114,7 +114,7 @@ Stored using a **Many-to-Many** relationship:
 ### Authentication
 
 #### Login
-```http
+
 POST /api/auth/signin
 EX:
     {
@@ -125,7 +125,9 @@ RESPONSE:
 JWT_TOKEN_STRING
 
 #### Register
+
 POST /api/auth/signup
+
 EX:
     {
         "email": "admin@example.com",
@@ -190,6 +192,8 @@ EX:
 
 DELETE /api/user/{id}
 
+---
+
 ## Configuration
 
 ### application.properties
@@ -204,6 +208,8 @@ spring.jpa.show-sql=true
 jwt.secret=${JWT_SECRET}
 jwt.expiration=3600000
 
+---
+
 ## Validation and Error Handling
 
 * Input validation using Jakarta Validation
@@ -212,10 +218,14 @@ jwt.expiration=3600000
     * ResourceNotFoundException
     * DuplicateResourceException
 
+---
+
 ## Notes
 
 For more security the Api rellies on a pre existing user with both ADMIN and USER role,
 so it can create the other users and give roles.
+
+---
 
 ## Running The Application
 
@@ -250,6 +260,8 @@ mvn spring-boot:run
 
 Application will be running on:
 `http://localhost:8080`
+
+---
 
 ## Author
 Pedro Heringer

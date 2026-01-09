@@ -1,1 +1,105 @@
-<p>home works!</p>
+<!-- Add Book button -->
+@if (auth.isAuthenticated() && (auth.isAdmin() || auth.isUser())) {
+  <div class="d-flex justify-content-end mb-4">
+    <button class="btn btn-success" routerLink="/books/add">
+      + Add Book
+    </button>
+  </div>
+}
+
+<!-- Filters -->
+<div class="card mb-4 shadow-sm">
+  <div class="card-body">
+    <div class="row g-3">
+
+      <div class="col-12 col-md-4">
+        <label class="form-label">Author</label>
+        <select class="form-select" (change)="onSelectAuthor($event)">
+          @for (author of allAuthors(); track author) {
+            <option value="{{ author }}">{{ author }}</option>
+          }
+        </select>
+      </div>
+
+      <div class="col-12 col-md-4">
+        <label class="form-label">Genre</label>
+        <select class="form-select" (change)="onSelectGenre($event)">
+          @for (genre of allGenres(); track genre) {
+            <option value="{{ genre }}">{{ genre }}</option>
+          }
+        </select>
+      </div>
+
+      <div class="col-12 col-md-4">
+        <label class="form-label">Year</label>
+        <select class="form-select" (change)="onSelectYear($event)">
+          @for (year of allYears(); track year) {
+            <option value="{{ year }}">{{ year }}</option>
+          }
+        </select>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- Search -->
+<div class="input-group mb-4">
+  <input
+    type="text"
+    class="form-control search-input"
+    placeholder="Search books"
+    #filter
+  />
+  <button class="btn btn-primary" (click)="searchResults(filter.value)">
+    Search
+  </button>
+</div>
+
+<!-- Books list -->
+<div class="row g-4">
+  @for (book of books(); track $index) {
+    <div class="col-12 col-md-6 col-lg-4">
+      <div class="card book-card h-100 shadow-sm">
+        <div class="card-body">
+          <h5 class="card-title">{{ book.title }}</h5>
+
+          <p class="mb-1"><strong>Author:</strong> {{ book.author }}</p>
+          <p class="mb-1"><strong>Genre:</strong> {{ book.genre }}</p>
+          <p class="mb-1"><strong>Year:</strong> {{ book.yearPublished }}</p>
+          <p class="mb-3"><strong>ISBN:</strong> {{ book.isbn }}</p>
+
+          @if (auth.isAuthenticated() && (auth.isAdmin() || auth.isUser())) {
+            <div class="d-flex justify-content-end gap-2">
+              <button class="btn btn-outline-primary btn-sm" (click)="edit(book)">
+                Edit
+              </button>
+              <button class="btn btn-outline-danger btn-sm" (click)="delete(book.isbn, book.title)">
+                Delete
+              </button>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  }
+</div>
+
+<!-- Pagination -->
+<div class="d-flex justify-content-center align-items-center mt-4 gap-3">
+  @if (currentPage > 0) {
+    <button class="btn btn-outline-secondary" (click)="previousPage()">
+      Previous
+    </button>
+  }
+
+  <span class="fw-semibold">
+    Page {{ currentPage + 1 }} of {{ totalPages }}
+  </span>
+
+  @if (currentPage < totalPages - 1) {
+    <button class="btn btn-outline-secondary" (click)="nextPage()">
+      Next
+    </button>
+  }
+</div>

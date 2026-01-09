@@ -1,0 +1,21 @@
+.card-title {
+  color: var(--bs-body-color);
+  font-weight: 600;
+}
+
+.form-label {
+  color: var(--bs-body-color);
+}
+
+.book-card p {
+  color: var(--bs-body-color);
+}
+
+.search-input {
+  background-color: var(--bs-body-bg);
+  color: var(--bs-body-color);
+}
+
+.search-input::placeholder {
+  color: var(--bs-secondary-color);
+}

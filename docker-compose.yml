@@ -19,7 +19,8 @@ services:
   image: book-backend
   container_name: book-backend
   depends_on:
-    - postgres
+    postgres:
+      condition: service_started
   ports:
     - "8080:8080"
   environment:
@@ -37,7 +38,8 @@ services:
     ports:
       - "4200:80"
     depends_on:
-      - backend
+    backend:
+      condition: service_started
 
 
 volumes:

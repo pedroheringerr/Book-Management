@@ -1,0 +1,71 @@
+<nav class="navbar navbar-expand-lg bg-body-tertiary">
+  <div class="container-fluid">
+
+    <!-- Brand -->
+    <a class="navbar-brand" routerLink="/">
+      {{ title() }}
+    </a>
+
+    <!-- Mobile toggle -->
+    <button
+      class="navbar-toggler"
+      type="button"
+      data-bs-toggle="collapse"
+      data-bs-target="#mainNavbar"
+      aria-controls="mainNavbar"
+      aria-expanded="false"
+      aria-label="Toggle navigation"
+    >
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <!-- Links -->
+    <div class="collapse navbar-collapse" id="mainNavbar">
+      <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+
+        @if (!auth.isAuthenticated()) {
+          <li class="nav-item">
+            <a class="nav-link" routerLink="/login">Login</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" routerLink="/signup">Create Account</a>
+          </li>
+        }
+
+        @if (auth.isAuthenticated()) {
+
+          @if (auth.isAdmin()) {
+            <li class="nav-item">
+              <a class="nav-link" routerLink="/users">Users</a>
+            </li>
+          }
+
+          <li class="nav-item">
+            <a class="nav-link text-danger" (click)="onLogout()" style="cursor: pointer;">
+              Sign Out
+            </a>
+          </li>
+
+        }
+
+      </ul>
+    </div>
+
+    <button
+      type="button"
+      class="btn btn-outline-secondary theme-toggle"
+      (click)="theme.toggleTheme()"
+      aria-label="Toggle theme">
+
+      <i
+        class="bi"
+        [ngClass]="theme.theme() === 'dark'
+          ? 'bi-moon-stars-fill'
+          : 'bi-sun-fill'">
+      </i>
+
+    </button>
+
+
+  </div>
+</nav>

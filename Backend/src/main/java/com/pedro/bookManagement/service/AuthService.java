@@ -1,5 +1,6 @@
 package com.pedro.bookManagement.service;
 
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.springframework.security.authentication.AuthenticationManager;
@@ -9,6 +10,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.pedro.bookManagement.dto.JwtResponse;
 import com.pedro.bookManagement.dto.UserLoginRequest;
 import com.pedro.bookManagement.dto.UserRegisterRequest;
 import com.pedro.bookManagement.dto.UserResponseDTO;
@@ -47,7 +49,7 @@ public class AuthService {
 		this.roleRepo = roleRepo;
 	}
 	
-	public String authenticateUser(UserLoginRequest dto) {
+	public JwtResponse authenticateUser(UserLoginRequest dto) {
 		if (!userRepo.existsByEmail(dto.email())) {
 			throw new ResourceNotFoundException("User with this email doesn't exist");
 		}
@@ -58,7 +60,17 @@ public class AuthService {
 				)
 		);
 		UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-		return jwtUtil.generateToken(userDetails.getUsername());
+		
+		User user = userRepo.findByEmail(userDetails.getUsername())
+				.orElseThrow(() -> new RuntimeException("User not found"));
+
+		Set<String> roles = user.getRoles()
+				.stream()
+				.map(Role::getName)
+				.collect(Collectors.toSet());
+
+		return new JwtResponse(jwtUtil.generateToken(user.getEmail(), roles));
+
 	}
 
 	public UserResponseDTO registerUser(UserRegisterRequest dto) {
@@ -71,10 +83,10 @@ public class AuthService {
     user.setLastName(dto.lastName());
     user.setPassword(passwordEncoder.encode(dto.password()));
 
-		Role userRole = roleRepo.findByName("USER")
-        .orElseThrow(() -> new RuntimeException("Role USER not found"));
+		Role readerRole = roleRepo.findByName("READER")
+        .orElseThrow(() -> new RuntimeException("Role READER not found"));
 
-    user.getRoles().add(userRole);
+    user.getRoles().add(readerRole);
 
 		User saved = userRepo.save(user);
 

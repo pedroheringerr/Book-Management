@@ -10,7 +10,6 @@ public record UserRegisterRequest(
     @NotBlank @Email String email,
     @NotBlank @Size(min = 6) String password,
     @NotBlank String firstName,
-    @NotBlank String lastName,
-		@NotNull Integer roleId
+    @NotBlank String lastName
 
 ) {}

@@ -45,7 +45,7 @@ public class Book {
   @Column(name = "updated_at")
   private Date updatedAt;
 
-	protected Book() {}
+	public Book() {}
 
 	public String getIsbn() {
 		return isbn;

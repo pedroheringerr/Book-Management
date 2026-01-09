@@ -2,6 +2,7 @@ package com.pedro.bookManagement.security;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
+import java.util.Set;
 
 import javax.crypto.SecretKey;
 
@@ -28,9 +29,10 @@ public class JwtUtil {
 		this.key = Keys.hmacShaKeyFor(jwtSecret.getBytes(StandardCharsets.UTF_8));
 	}
 
-	public String generateToken(String username) {
+	public String generateToken(String username, Set<String> roles) {
 		return Jwts.builder()
 			.setSubject(username)
+			.claim("roles", roles)
 			.setIssuedAt(new Date())
 			.setExpiration(new Date((new Date()).getTime() + jwtExpirationMs))
 			.signWith(key, SignatureAlgorithm.HS256)

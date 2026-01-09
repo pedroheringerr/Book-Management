@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.pedro.bookManagement.dto.BookResponseDTO;
 import com.pedro.bookManagement.model.Book;
 import com.pedro.bookManagement.service.BookService;
 
@@ -36,24 +37,27 @@ public class BookController {
 	}
 
 	@GetMapping
-		public ResponseEntity<Page<Book>> getBooksByFilter(
+		public ResponseEntity<Page<BookResponseDTO>> getBooksByFilter(
 			@RequestParam(required = false) String genre,
 			@RequestParam(required = false) String author,
-			@RequestParam(required = false)	Integer yearPublished,
+			@RequestParam(required = false)
+			@PositiveOrZero
+			Integer yearPublished,
+			@RequestParam(required = false)	String search,
 
 			@RequestParam(value = "page", required = false, defaultValue = "0")
 			@Min(value = 0, message = "Page must be 0 or greater")
 			@PositiveOrZero(message = "Page must be 0 or greater")
 			Integer page,
 
-			@RequestParam(value = "size", required = false, defaultValue = "5")
+			@RequestParam(value = "size", required = false, defaultValue = "9")
 			@Min(value = 1, message = "Size must be at least 1")
 			@Max(value = 50, message = "Size must be at most 50")
 			Integer size
 			) {
 			return ResponseEntity
 				.status(HttpStatus.OK)
-				.body(bookService.findByFilter(genre, author, yearPublished, page, size));
+				.body(bookService.searchBooks(genre, author, yearPublished, search, page, size));
 			}
 
 	@GetMapping("/{isbn}")
@@ -63,13 +67,6 @@ public class BookController {
 			.body(bookService.findByIsbn(isbn));
 	}
 
-	@GetMapping("/{title}")
-	public ResponseEntity<Book> getBookByTitle(@PathVariable String title) {
-		return ResponseEntity
-			.status(HttpStatus.OK)
-			.body(bookService.findByTitle(title));
-	}
-	
 	@PostMapping
 	@PreAuthorize("hasRole('USER')")
 	public ResponseEntity<Book> saveBook(@Valid @RequestBody Book book) {
@@ -88,7 +85,7 @@ public class BookController {
 
 	@DeleteMapping("/{isbn}")
 	@PreAuthorize("hasRole('USER')")
-	public ResponseEntity<Book> deleteBook(@PathVariable String isbn) {
+	public ResponseEntity<Void> deleteBook(@PathVariable String isbn) {
 		bookService.deleteBook(isbn);
 		return ResponseEntity.noContent().build();
 	}

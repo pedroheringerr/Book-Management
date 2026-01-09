@@ -36,23 +36,35 @@ public class AuthTokenFilter extends OncePerRequestFilter {
 	) throws ServletException, IOException {
 			try {
 				String jwt = parseJwt(request);
-        if (jwt != null && jwtUtils.validateJwtToken(jwt)) {
-            String username = jwtUtils.getUsernameFromToken(jwt);
-            UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-            UsernamePasswordAuthenticationToken authentication =
-                    new UsernamePasswordAuthenticationToken(
-                            userDetails,
-                            null,
-                            userDetails.getAuthorities()
-                    );
-						System.out.println("JWT valid: " + jwtUtils.validateJwtToken(jwt));
-            authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-            SecurityContextHolder.getContext().setAuthentication(authentication);
-						System.out.println("Authenticated user: " +
-					    SecurityContextHolder.getContext().getAuthentication());
-        }
-      } catch (Exception e) {
-            System.out.println("Cannot set user authentication: " + e);
+        if (jwt != null) {
+            if (jwtUtils.validateJwtToken(jwt)) {
+                String username = jwtUtils.getUsernameFromToken(jwt);
+
+                UserDetails userDetails =
+                        userDetailsService.loadUserByUsername(username);
+
+                UsernamePasswordAuthenticationToken authentication =
+                        new UsernamePasswordAuthenticationToken(
+                                userDetails,
+                                null,
+                                userDetails.getAuthorities()
+                        );
+
+                authentication.setDetails(
+                        new WebAuthenticationDetailsSource().buildDetails(request)
+                );
+
+                SecurityContextHolder.getContext()
+                        .setAuthentication(authentication);
+						}
+						else {
+							SecurityContextHolder.clearContext();
+						}
+					}
+				}
+				catch (Exception e) {
+					SecurityContextHolder.clearContext();
+					System.out.println("JWT processing failed: " + e.getMessage());
         }
 			System.out.println("Authorization header: " + request.getHeader("Authorization"));
       filterChain.doFilter(request, response);

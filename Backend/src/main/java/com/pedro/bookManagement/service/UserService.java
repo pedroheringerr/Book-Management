@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.pedro.bookManagement.exception.ResourceNotFoundException;
 import com.pedro.bookManagement.model.Role;
@@ -92,7 +93,8 @@ public class UserService {
     userRepo.deleteById(id);
 	}
 
-	public UserResponseDTO updateUserRoles(Long userId, Set<String> roleNames) {
+	@Transactional
+	public UserResponseDTO updateUserRoles(Long userId, String email, String firstName, String lastName, Set<String> roleNames) {
     User user = userRepo.findById(userId)
         .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
@@ -101,7 +103,11 @@ public class UserService {
             .orElseThrow(() -> new ResourceNotFoundException("Role not found: " + name)))
         .collect(Collectors.toSet());
 
+		user.setEmail(email);
+		user.setFirstName(firstName);
+		user.setLastName(lastName);
     user.setRoles(roles);
+
 
     return mapToDTO(user);
 	}

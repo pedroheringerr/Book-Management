@@ -41,6 +41,16 @@ public class UserController {
 			.body(userService.findAll(page, size));
 	}
 
+	@GetMapping("/{id}")
+	@PreAuthorize("hasRole('ADMIN')")
+	public ResponseEntity<UserResponseDTO> getUserById(
+		@PathVariable Long id
+	) {
+		return ResponseEntity
+			.status(HttpStatus.OK)
+			.body(userService.findById(id));
+	}
+
 	@DeleteMapping("/{id}")
 	@PreAuthorize("hasRole('ADMIN')")
 	public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
@@ -54,9 +64,9 @@ public class UserController {
 	@PreAuthorize("hasRole('ADMIN')")
 	public UserResponseDTO updateRoles(
 			@PathVariable Long id,
-			@RequestBody UpdateUserRolesRequest request
+			@RequestBody UpdateUserRequest request
 			) {
-		return userService.updateUserRoles(id, request.roles());
+		return userService.updateUserRoles(id, request.email(), request.firstName(), request.lastName(), request.roles());
 			}
 
 }

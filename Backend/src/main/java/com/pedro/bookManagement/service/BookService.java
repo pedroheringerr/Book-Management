@@ -8,12 +8,14 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Service;
 
 import com.pedro.bookManagement.exception.DuplicateResourceException;
 import com.pedro.bookManagement.exception.ResourceNotFoundException;
 import com.pedro.bookManagement.model.Book;
 import com.pedro.bookManagement.repo.BookRepo;
+import com.pedro.bookManagement.dto.BookResponseDTO;
 
 @Service
 public class BookService {
@@ -30,41 +32,39 @@ public class BookService {
 			orElseThrow(() -> new ResourceNotFoundException("Book not found"));
 	}
 
-	@Cacheable(cacheNames="book", key="#title")
+	@Cacheable(cacheNames="book")
 	public Book findByTitle(String title) {
 		return bookRepo.findByTitle(title)
 			.orElseThrow(() -> new ResourceNotFoundException("Book not found"));
 	}
 
-	@Cacheable(cacheNames="books", key="{ #genre, #author, #yearPublished, #page, #size }")
-	public Page<Book> findByFilter(String genre, String author, Integer yearPublished, Integer page, Integer size) {
+	@Cacheable(cacheNames="books", key="{ #genre, #author, #yearPublished, #search, #page, #size }")
+	public Page<BookResponseDTO> searchBooks(
+			String genre,
+			String author,
+			Integer yearPublished,
+			String search,
+			Integer page,
+			Integer size
+			) {
 		PageRequest pageRequest = PageRequest.of(
 				page,
 				size
 				);
-		if (genre != null && author != null && yearPublished != null) {
-			return bookRepo.findByAuthorAndGenreAndYearPublished(author, genre, yearPublished, pageRequest);
-		}
-		if (genre != null && author != null) {
-			return bookRepo.findByAuthorAndGenre(author, genre, pageRequest);
-		}
-		if (genre != null && yearPublished != null) {
-			return bookRepo.findByGenreAndYearPublished(genre, yearPublished, pageRequest);
-		}
-		if (author != null && yearPublished != null) {
-			return bookRepo.findByAuthorAndYearPublished(author, yearPublished, pageRequest);
-		}
-		if (author != null) {
-			return bookRepo.findByAuthor(author, pageRequest);
-		}
-		if (genre != null) {
-			return bookRepo.findByGenre(genre, pageRequest);
-		}
-		if (yearPublished != null) {
-			return bookRepo.findByYearPublished(yearPublished, pageRequest);
-		}
-		return bookRepo.findAll(pageRequest);
-	}
+		return this.bookRepo.
+			findByFilteredAndSearched(
+				genre,
+				author, 
+				yearPublished,
+				search, 
+				pageRequest
+				).map(book -> new BookResponseDTO(
+						book.getIsbn(),
+						book.getTitle(), 
+						book.getAuthor(),
+						book.getYearPublished(),
+						book.getGenre()));
+			}
 	
 	@CacheEvict(cacheNames="books", allEntries=true)
 	public Book saveBook(Book book) {
@@ -74,7 +74,7 @@ public class BookService {
 		return bookRepo.save(book);
 	}
 
-	@Caching(put = { @CachePut(cacheNames="book", key="#isbn"), @CachePut(cacheNames="book", key="#title")}, evict = @CacheEvict(cacheNames="books", allEntries=true))
+	@Caching(put = @CachePut(cacheNames="book", key="#isbn"), evict = @CacheEvict(cacheNames="books", allEntries=true))
 	public Book updateBook(String isbn, Book book) {
 		Book updatedBook = bookRepo.findById(isbn).get(); 
 		updatedBook.setTitle(book.getTitle());
@@ -87,7 +87,6 @@ public class BookService {
 	@Caching(evict = {
 		@CacheEvict(cacheNames="books", allEntries=true),
 		@CacheEvict(cacheNames="book", key="#isbn"),
-		@CacheEvict(cacheNames="book", key="#title")
 	})
 	public void deleteBook(String isbn) {
 		if (!bookRepo.existsByIsbn(isbn)) {

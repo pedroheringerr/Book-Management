@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.pedro.bookManagement.dto.JwtResponse;
 import com.pedro.bookManagement.dto.UserLoginRequest;
 import com.pedro.bookManagement.dto.UserRegisterRequest;
 import com.pedro.bookManagement.dto.UserResponseDTO;
@@ -24,8 +25,8 @@ public class AuthController {
 	}
 
 	@PostMapping("/signin")
-	public String authenticateUser(@RequestBody UserLoginRequest dto) {
-		return authService.authenticateUser(dto);
+	public ResponseEntity<JwtResponse> authenticateUser(@RequestBody UserLoginRequest dto) {
+		return ResponseEntity.ok(authService.authenticateUser(dto));
 	}
 
 	@PostMapping("/signup")

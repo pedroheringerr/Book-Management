@@ -1,0 +1,42 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: book-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: book_management
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "5433:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  backend:
+    image: book-backend
+    container_name: book-backend
+    restart: unless-stopped
+    depends_on:
+      - postgres
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE}
+      DB_URL: ${DB_URL}
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET}
+
+  frontend:
+    build:
+      context: ./Frontend
+      dockerfile: Dockerfile
+    container_name: book-frontend
+    ports:
+      - "4200:80"
+    depends_on:
+      - backend
+
+
+volumes:
+  pgdata:

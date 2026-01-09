@@ -1,0 +1,34 @@
+<form [formGroup]="userForm" (ngSubmit)="submit()">
+  <div>
+    <label for="email">
+      Email:
+    </label>
+    <input type="text" formControlName="email" required placeholder="email@example.com"/>
+    <label for="firstName">
+      First Name:
+    </label>
+    <input type="text" formControlName="firstName" required placeholder="Name"/>
+    <label for="lastName">
+      Last Name:
+    </label>
+    <input type="text" formControlName="lastName" required placeholder="Last Name"/>
+    <label for="roles">
+      Roles:
+    </label>
+    <div formArrayName="roles">
+      @if (rolesReady) {
+        @for (role of allRoles; track role; let i = $index) {
+        <label>
+          <input type="checkbox" [formControlName]="i"/>
+          {{ role }}
+        </label>
+        }
+      }
+    </div>
+  </div>
+  <div>
+    <button type="submit" [disabled]="userForm.invalid || (userForm.pristine)">
+      Edit
+    </button>
+  </div>
+</form>

@@ -1,0 +1,33 @@
+<div class="row g-4">
+  @for (user of users(); track user) {
+    <div class="col-12 col-md-6 col-lg-4">
+      <div class="card user-card shadow-sm h-100">
+        <div class="card-body">
+
+          <h5 class="card-title">{{ user.email }}</h5>
+
+          <p class="mb-1"><strong>ID:</strong> {{ user.id }}</p>
+          <p class="mb-1"><strong>First Name:</strong> {{ user.firstName }}</p>
+          <p class="mb-3"><strong>Last Name:</strong> {{ user.lastName }}</p>
+
+          <div class="d-flex justify-content-end gap-2">
+            <button
+              class="btn btn-outline-primary btn-sm"
+              (click)="edit(user.id)"
+            >
+              Edit
+            </button>
+
+            <button
+              class="btn btn-outline-danger btn-sm"
+              (click)="delete(user.id)"
+            >
+              Delete
+            </button>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  }
+</div>

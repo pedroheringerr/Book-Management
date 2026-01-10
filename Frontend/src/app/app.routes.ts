@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 import { authGuard } from './guard/auth-guard';
 import { roleGuard } from './guard/role-guard';
+import { Charts } from './pages/charts/charts';
 
 export const routes: Routes = [
   {
@@ -46,5 +47,10 @@ export const routes: Routes = [
       import('./pages/edit-user/edit-user').then(m => m.EditUser),
     canActivate: [authGuard, roleGuard],
     data: { roles: [ 'ADMIN' ] }
+  },
+  {
+  path: 'charts',
+  component: Charts
   }
+
 ];

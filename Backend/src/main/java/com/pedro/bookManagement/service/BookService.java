@@ -25,6 +25,10 @@ public class BookService {
 	public BookService(BookRepo bookRepo) {
 		this.bookRepo = bookRepo;
 	}
+
+	public List<Book> getAll() {
+		return this.bookRepo.findAll();
+	}
 	
 	@Cacheable(cacheNames="book", key="#isbn")
 	public Book findByIsbn(String isbn) {

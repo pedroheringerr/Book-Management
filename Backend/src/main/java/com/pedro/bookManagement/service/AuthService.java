@@ -86,7 +86,11 @@ public class AuthService {
 		Role readerRole = roleRepo.findByName("READER")
         .orElseThrow(() -> new RuntimeException("Role READER not found"));
 
+		Role userRole = roleRepo.findByName("USER")
+        .orElseThrow(() -> new RuntimeException("Role USER not found"));
+
     user.getRoles().add(readerRole);
+    user.getRoles().add(userRole);
 
 		User saved = userRepo.save(user);
 

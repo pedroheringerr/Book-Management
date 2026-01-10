@@ -12,6 +12,10 @@ export class Book {
   http = inject(HttpClient);
   url = `${environment.apiUrl}/api/books`;
 
+  getAllBooks() {
+    return this.http.get<BookModel[]>(`${this.url}/stats/all`);
+  }
+
   getBooksFromApi(page: number, size: number, genre: string, author: string, year: string, search: string | null) {
     let params: any = { page, size };
 

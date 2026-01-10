@@ -10,7 +10,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.pedro.bookManagement.model.Book;
 import com.pedro.bookManagement.model.Role;
-import com.pedro.bookManagement.model.User;
+import com.pedro.bookManagement.model.User; 
 import com.pedro.bookManagement.repo.BookRepo;
 import com.pedro.bookManagement.repo.RoleRepo;
 import com.pedro.bookManagement.repo.UserRepo;
@@ -31,7 +31,7 @@ public class DataInitializer {
       Role user   = createRoleIfNotExists(roleRepo, "USER");
       Role admin  = createRoleIfNotExists(roleRepo, "ADMIN");
 
-      createAdminIfNotExists(userRepo, passwordEncoder, admin);
+      createAdminIfNotExists(userRepo, passwordEncoder, admin, user);
 
       createBooksIfNotExists(bookRepo);
     };
@@ -45,7 +45,8 @@ public class DataInitializer {
   private void createAdminIfNotExists(
       UserRepo userRepo,
       PasswordEncoder encoder,
-      Role adminRole
+      Role adminRole,
+			Role userRole
   ) {
     String email = "admin@system.com";
 
@@ -56,7 +57,7 @@ public class DataInitializer {
     User admin = new User();
     admin.setEmail(email);
     admin.setPassword(encoder.encode("admin123"));
-    admin.setRoles(Set.of(adminRole));
+    admin.setRoles(Set.of(adminRole, userRole));
 
     userRepo.save(admin);
   }

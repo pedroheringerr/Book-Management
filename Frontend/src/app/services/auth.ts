@@ -45,18 +45,30 @@ export class Auth {
   isAuthenticated(): boolean {
     const token = localStorage.getItem('token');
 
-    return !!token && !this.jwtValidator.isTokenExpired(token);
+    if (!this.isValidJwt(token)) {
+      return false;
+    }
+
+    return !this.jwtValidator.isTokenExpired(token!);
   }
+
 
   private loadUserFromToken(): void {
     const token = localStorage.getItem('token');
 
-    if (!token || this.jwtValidator.isTokenExpired(token)) {
+    if (!this.isValidJwt(token)) {
       this.userSubject.next(null);
+      localStorage.removeItem('token');
       return;
     }
 
-    const decoded: any = this.jwtValidator.decodeToken(token);
+    if (this.jwtValidator.isTokenExpired(token!)) {
+      this.userSubject.next(null);
+      localStorage.removeItem('token');
+      return;
+    }
+
+    const decoded: any = this.jwtValidator.decodeToken(token!);
 
     const roles =
       decoded.roles ??
@@ -68,6 +80,7 @@ export class Auth {
       roles,
     });
   }
+
 
   get user(): AuthUser | null {
     return this.userSubject.value;
@@ -83,5 +96,9 @@ export class Auth {
 
   isUser(): boolean {
     return this.hasRole('USER');
+  }
+
+  private isValidJwt(token: string | null): boolean {
+    return !!token && token.split('.').length === 3;
   }
 }

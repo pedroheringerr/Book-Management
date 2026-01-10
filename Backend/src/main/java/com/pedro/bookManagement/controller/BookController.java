@@ -1,6 +1,9 @@
 package com.pedro.bookManagement.controller;
 
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -34,6 +37,13 @@ public class BookController {
 
 	public BookController(BookService bookService) {
 		this.bookService = bookService;
+	}
+
+	@GetMapping("/stats/all")
+	public ResponseEntity<List<Book>> getAllBooks() {
+		return ResponseEntity
+			.status(HttpStatus.OK)
+			.body(this.bookService.getAll());
 	}
 
 	@GetMapping

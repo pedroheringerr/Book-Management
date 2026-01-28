@@ -1,4 +1,4 @@
-# 📚 Book Management API
+# Book Management API
 
 A RESTful backend application for managing books and users, built with **Spring Boot**, **Spring Security**, **JWT authentication**, and **PostgreSQL**.
 
@@ -11,7 +11,7 @@ The system supports **role-based access control**, secure authentication, pagina
 ### Authentication & Security
 - JWT-based authentication
 - Stateless session management
-- Role-based authorization (`USER`, `ADMIN`)
+- Role-based authorization (`READER`, `USER`, `ADMIN`)
 - Secure password hashing
 - Custom authentication filter
 
@@ -22,7 +22,7 @@ The system supports **role-based access control**, secure authentication, pagina
 - Delete users (`ADMIN` only)
 
 ### Book Management
-- Create, update, delete books (authenticated users)
+- Create, update, delete books (`USER` only)
 - Public read access (GET)
 - Filter books by:
   - Genre
@@ -30,6 +30,7 @@ The system supports **role-based access control**, secure authentication, pagina
   - Year published
 - Pagination support
 - Input validation (ISBN, year range, etc.)
+- Search
 
 ### Architecture
 - Layered architecture:
@@ -71,7 +72,7 @@ com.pedro.bookManagement
 
 ---
 
-## 🔑 Authentication Flow (JWT)
+## Authentication Flow (JWT)
 
 1. User logs in via `/api/auth/signin`
 2. Server returns a **JWT token**
@@ -88,6 +89,7 @@ com.pedro.bookManagement
 ## Roles & Authorization
 
 ### Roles
+- `READER`
 - `USER`
 - `ADMIN`
 
@@ -118,11 +120,14 @@ Stored using a **Many-to-Many** relationship:
 POST /api/auth/signin
 EX:
     {
-        "email": "admin@example.com",
-        "password": "password123"
+        "email": "admin@system.com",
+        "password": "admin123"
     }
+
 RESPONSE:
-JWT_TOKEN_STRING
+{
+    "token": "JWT_TOKEN_STRING"
+}
 
 #### Register
 
@@ -133,8 +138,7 @@ EX:
         "email": "admin@example.com",
         "password": "password123",
         "firstName": "Admin",
-        "lastName": "Nimda",
-        "roleId": 2
+        "lastName": "Nimda"
     }
 
 ### Books
@@ -142,7 +146,7 @@ EX:
 #### Get Books with filters
 
 GET
-/api/books?author=John&page=0&size=5
+/api/books?author=John&page=0&size=9
 
 #### Create Books(USER Only)
 
@@ -159,7 +163,7 @@ EX:
 
 #### Update Books(USER Only)
 
-PUT /api/books/{id}
+PUT /api/books/{isbn}
 EX:
     {
       "isbn": "9781234567890",
@@ -171,7 +175,7 @@ EX:
 
 #### Delete Books(USER Only)
 
-DELETE /api/books/{id} 
+DELETE /api/books/{isbn} 
 
 ### Users(ADMIN only)
 
@@ -185,7 +189,10 @@ GET
 PUT /api/user/{id}
 EX:
     {
-      "roles": ["ADMIN", "USER"]
+        "email": "email@example.com",
+        "firstName": "firstName",
+        "lastName": "lastName",
+        "roles": ["ADMIN", "USER"]
     }
 
 #### Delete User
@@ -206,7 +213,7 @@ spring.jpa.hibernate.ddl-auto=update
 spring.jpa.show-sql=true
 
 jwt.secret=${JWT_SECRET}
-jwt.expiration=3600000
+jwt.expiration=7200000
 
 ---
 
@@ -223,7 +230,12 @@ jwt.expiration=3600000
 ## Notes
 
 For more security the Api rellies on a pre existing user with both ADMIN and USER role,
-so it can create the other users and give roles.
+so the API automatically creates a user with all roles:
+
+email: admin@system.com
+password: admin123
+
+And for easier testing all new user comes with the USER and READER roles.
 
 ---
 
@@ -233,7 +245,6 @@ so it can create the other users and give roles.
 
 * Java 21+
 * PostgreSQL
-* Maven
 
 ### Steps
 
@@ -249,13 +260,11 @@ spring.datasource.password=${DB_PASSWORD}
 
 Then change the ${JWT_SECRET} with it
 
-
-
 #### Running the Application
 
 ```
-mvn clean install
-mvn spring-boot:run
+./mvnw clean install
+./mvnw spring-boot:run
 ```
 
 Application will be running on:

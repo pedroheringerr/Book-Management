@@ -78,6 +78,20 @@ docker compose up --build
 
 ---
 
+## Notes
+
+The application comes with and all roles account
+that can be accessed with the following:
+
+email: admin@system.com
+password: admin123
+
+This account has access to everything in the application.
+
+And for easier testing all new accounts comes with the `READER` and `USER` roles.
+
+---
+
 ## Project Structure
 
 ```text

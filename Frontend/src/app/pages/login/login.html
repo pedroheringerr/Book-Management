@@ -5,7 +5,6 @@
         <h4 class="card-title text-center mb-4">Sign In</h4>
 
         <form [formGroup]="loginForm" (ngSubmit)="submit()">
-
           <div class="mb-3">
             <label class="form-label">Email</label>
             <input
@@ -26,10 +25,9 @@
             />
           </div>
 
-          <button class="btn btn-primary w-100" type="submit">
+          <button class="btn btn-primary w-100" [disabled]="loginForm.invalid" type="submit">
             Sign In
           </button>
-
         </form>
       </div>
     </div>
